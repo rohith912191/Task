@@ -101,7 +101,7 @@ function TransactionsPanel({
         </div>
       </div>
 
-      {role === 'Admin' && (
+      {role === 'Admin' ? (
         <div className="add-panel">
           <h3>Add transaction</h3>
           <form onSubmit={handleSubmit} className="transaction-form">
@@ -150,6 +150,10 @@ function TransactionsPanel({
               Add transaction
             </button>
           </form>
+        </div>
+      ) : (
+        <div className="role-note">
+          <p>Switch to <strong>Admin</strong> role above to add new transactions.</p>
         </div>
       )}
 
