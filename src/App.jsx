@@ -220,6 +220,9 @@ function App() {
           <p className="subtitle">
             Clean, interactive data views for monthly spending, income, and financial performance.
           </p>
+          <p className="developer-tagline">
+            Built and maintained by Aggannagqri Rohith Reddy — CSE undergraduate focused on Python, web development, and machine learning.
+          </p>
         </div>
 
         <div className="header-actions">
@@ -279,6 +282,20 @@ function App() {
           />
         </section>
       </main>
+
+      <footer className="app-footer">
+        <div>
+          <p className="footer-title">Aggannagqri Rohith Reddy</p>
+          <p>Computer Science undergraduate | Python, Web Development, Machine Learning</p>
+        </div>
+        <div className="footer-links">
+          <a href="mailto:rohith912191@gmail.com">rohith912191@gmail.com</a>
+          <a href="tel:+919121916107">+91 91219 6107</a>
+          <a href="https://github.com/rohith912191" target="_blank" rel="noreferrer">GitHub</a>
+          <a href="#">Portfolio</a>
+          <a href="#">LinkedIn</a>
+        </div>
+      </footer>
     </div>
   );
 }

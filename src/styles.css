@@ -549,6 +549,49 @@ button {
   margin-bottom: 12px;
 }
 
+.developer-tagline {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.app-footer {
+  margin-top: 48px;
+  padding: 24px 28px;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-title {
+  margin: 0 0 6px;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+}
+
+.footer-links a {
+  color: var(--primary);
+  text-decoration: none;
+  font-size: 0.94rem;
+}
+
+.footer-links a:hover {
+  text-decoration: underline;
+}
+
 .insight-label {
   color: var(--muted);
   font-size: 0.9rem;
