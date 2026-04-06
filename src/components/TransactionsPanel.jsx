@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { Search, Plus, Loader2 } from 'lucide-react';
 
 const categoryOptions = [
   'Groceries',
@@ -30,28 +31,40 @@ function TransactionsPanel({
   isLoading
 }) {
   const [form, setForm] = useState({ date: '', amount: '', category: 'Groceries', type: 'expense', description: '' });
+  const [errors, setErrors] = useState({});
 
   const totalTransactions = rawTransactions.length;
   const displayedTransactions = transactions.length;
 
   const handleChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: '' }));
+    }
   };
 
-  const canSave = useMemo(() => {
-    return form.date && form.amount > 0 && form.category && form.description;
-  }, [form]);
+  const validateForm = () => {
+    const newErrors = {};
+    if (!form.date) newErrors.date = 'Date is required';
+    if (!form.amount || form.amount <= 0) newErrors.amount = 'Valid amount is required';
+    if (!form.description.trim()) newErrors.description = 'Description is required';
+    if (!form.category) newErrors.category = 'Category is required';
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (!canSave) return;
+    if (!validateForm()) return;
 
     onAddTransaction({
       date: form.date,
       amount: Number(form.amount),
       category: form.category,
       type: form.type,
-      description: form.description
+      description: form.description.trim()
     });
 
     setForm({ date: '', amount: '', category: 'Groceries', type: 'expense', description: '' });
@@ -60,6 +73,9 @@ function TransactionsPanel({
   return (
     <section className="transactions-panel">
       <div className="panel-header">
+        <div className="panel-icon">
+          <Search size={20} />
+        </div>
         <div>
           <p className="eyebrow">Transactions</p>
           <h2>Recent activity</h2>
@@ -70,12 +86,15 @@ function TransactionsPanel({
       </div>
 
       <div className="transactions-controls">
-        <input
-          type="search"
-          placeholder="Search category or description"
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-        />
+        <div className="search-input-wrapper">
+          <Search size={16} className="search-icon" />
+          <input
+            type="search"
+            placeholder="Search category or description"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
+        </div>
         <div className="filter-row">
           <label>
             Type
@@ -97,19 +116,30 @@ function TransactionsPanel({
             type="button"
             onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')}
           >
-            {sortDirection === 'asc' ? 'Asc' : 'Desc'}
+            {sortDirection === 'asc' ? '↑ Asc' : '↓ Desc'}
           </button>
         </div>
       </div>
 
       {role === 'Admin' ? (
         <div className="add-panel">
-          <h3>Add transaction</h3>
+          <div className="panel-header">
+            <div className="panel-icon">
+              <Plus size={20} />
+            </div>
+            <h3>Add transaction</h3>
+          </div>
           <form onSubmit={handleSubmit} className="transaction-form">
             <div className="form-grid">
               <label>
                 Date
-                <input type="date" value={form.date} onChange={(event) => handleChange('date', event.target.value)} />
+                <input
+                  type="date"
+                  value={form.date}
+                  onChange={(event) => handleChange('date', event.target.value)}
+                  className={errors.date ? 'error' : ''}
+                />
+                {errors.date && <span className="error-message">{errors.date}</span>}
               </label>
               <label>
                 Amount
@@ -119,23 +149,31 @@ function TransactionsPanel({
                   step="0.01"
                   value={form.amount}
                   onChange={(event) => handleChange('amount', event.target.value)}
+                  placeholder="0.00"
+                  className={errors.amount ? 'error' : ''}
                 />
+                {errors.amount && <span className="error-message">{errors.amount}</span>}
               </label>
               <label>
                 Category
-                <select value={form.category} onChange={(event) => handleChange('category', event.target.value)}>
+                <select
+                  value={form.category}
+                  onChange={(event) => handleChange('category', event.target.value)}
+                  className={errors.category ? 'error' : ''}
+                >
                   {categoryOptions.map((name) => (
                     <option key={name} value={name}>
                       {name}
                     </option>
                   ))}
                 </select>
+                {errors.category && <span className="error-message">{errors.category}</span>}
               </label>
               <label>
                 Type
                 <select value={form.type} onChange={(event) => handleChange('type', event.target.value)}>
-                  <option value="expense">Expense</option>
-                  <option value="income">Income</option>
+                  <option value="expense">💸 Expense</option>
+                  <option value="income">💰 Income</option>
                 </select>
               </label>
               <label className="full-width">
@@ -144,11 +182,24 @@ function TransactionsPanel({
                   type="text"
                   value={form.description}
                   onChange={(event) => handleChange('description', event.target.value)}
+                  placeholder="Enter transaction description"
+                  className={errors.description ? 'error' : ''}
                 />
+                {errors.description && <span className="error-message">{errors.description}</span>}
               </label>
             </div>
-            <button type="submit" className="primary-button" disabled={!canSave || isLoading}>
-              {isLoading ? 'Adding...' : 'Add transaction'}
+            <button type="submit" className="primary-button" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 size={16} className="loading-spinner" />
+                  Adding...
+                </>
+              ) : (
+                <>
+                  <Plus size={16} />
+                  Add transaction
+                </>
+              )}
             </button>
           </form>
         </div>
@@ -179,14 +230,16 @@ function TransactionsPanel({
                   <td className={`transaction-type transaction-type--${transaction.type}`}>
                     {transaction.type}
                   </td>
-                  <td>{formatCurrency(transaction.amount)}</td>
+                  <td className="amount-cell">{formatCurrency(transaction.amount)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         ) : (
           <div className="empty-state-block">
-            <p>No transactions match the current filter.</p>
+            <Search size={48} stroke="var(--muted)" />
+            <p>No transactions match your current filters.</p>
+            <small>Try adjusting your search or filter criteria</small>
           </div>
         )}
       </div>

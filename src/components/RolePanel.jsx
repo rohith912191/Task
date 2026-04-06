@@ -1,11 +1,16 @@
+import { User, Shield } from 'lucide-react';
+
 function RolePanel({ role, onRoleChange }) {
   return (
     <div className="role-panel">
       <label>
+        <div className="role-icon">
+          {role === 'Admin' ? <Shield size={16} /> : <User size={16} />}
+        </div>
         Role
         <select value={role} onChange={(event) => onRoleChange(event.target.value)}>
-          <option value="Viewer">Viewer</option>
-          <option value="Admin">Admin</option>
+          <option value="Viewer">👁️ Viewer</option>
+          <option value="Admin">⚡ Admin</option>
         </select>
       </label>
     </div>

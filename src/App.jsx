@@ -4,6 +4,7 @@ import SummaryCards from './components/SummaryCards.jsx';
 import ChartsPanel from './components/ChartsPanel.jsx';
 import TransactionsPanel from './components/TransactionsPanel.jsx';
 import InsightsPanel from './components/InsightsPanel.jsx';
+import { Moon, Sun, Download, Wallet } from 'lucide-react';
 import './styles.css';
 
 const initialTransactions = [
@@ -206,9 +207,16 @@ function App() {
   return (
     <div className="app-shell">
       <header className="topbar">
-        <div>
-          <p className="eyebrow">Personal finance dashboard</p>
-          <h1>Finance snapshot</h1>
+        <div className="header-main">
+          <div className="logo-section">
+            <div className="logo-icon">
+              <Wallet size={24} />
+            </div>
+            <div>
+              <p className="eyebrow">Personal finance dashboard</p>
+              <h1>Finance snapshot</h1>
+            </div>
+          </div>
           <p className="subtitle">
             Clean, interactive data views for monthly spending, income, and financial performance.
           </p>
@@ -219,15 +227,19 @@ function App() {
             type="button"
             className="theme-switcher"
             onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
           >
-            {theme === 'light' ? 'Dark mode' : 'Light mode'}
+            {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
+            <span className="button-text">{theme === 'light' ? 'Dark' : 'Light'}</span>
           </button>
           <button
             type="button"
             className="export-button"
             onClick={exportToCSV}
+            title="Export transactions to CSV"
           >
-            Export CSV
+            <Download size={16} />
+            <span className="button-text">Export</span>
           </button>
           <RolePanel role={role} onRoleChange={setRole} />
         </div>
