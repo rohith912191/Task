@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useReducer } from 'react';
 import RolePanel from './components/RolePanel.jsx';
 import SummaryCards from './components/SummaryCards.jsx';
 import ChartsPanel from './components/ChartsPanel.jsx';
@@ -22,25 +22,58 @@ const initialTransactions = [
 const formatCurrency = (value) =>
   new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
 
+// Action types for reducer
+const ADD_TRANSACTION = 'ADD_TRANSACTION';
+const DELETE_TRANSACTION = 'DELETE_TRANSACTION';
+const UPDATE_TRANSACTION = 'UPDATE_TRANSACTION';
+
+// Reducer for transactions
+function transactionsReducer(state, action) {
+  switch (action.type) {
+    case ADD_TRANSACTION:
+      return [...state, action.payload];
+    case DELETE_TRANSACTION:
+      return state.filter(t => t.id !== action.payload);
+    case UPDATE_TRANSACTION:
+      return state.map(t => t.id === action.payload.id ? action.payload : t);
+    default:
+      return state;
+  }
+}
+
 function App() {
-  const [transactions, setTransactions] = useState(initialTransactions);
+  const [transactions, dispatch] = useReducer(transactionsReducer, initialTransactions);
   const [role, setRole] = useState('Viewer');
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [sortKey, setSortKey] = useState('date');
   const [sortDirection, setSortDirection] = useState('desc');
   const [theme, setTheme] = useState('light');
+  const [isLoading, setIsLoading] = useState(false);
 
+  // Load data from localStorage on mount
   useEffect(() => {
+    const savedTransactions = localStorage.getItem('finance-dashboard-transactions');
     const savedTheme = localStorage.getItem('finance-dashboard-theme');
     const savedRole = localStorage.getItem('finance-dashboard-role');
-    if (savedTheme) {
-      setTheme(savedTheme);
+
+    if (savedTransactions) {
+      try {
+        const parsed = JSON.parse(savedTransactions);
+        parsed.forEach(t => dispatch({ type: ADD_TRANSACTION, payload: t }));
+      } catch (e) {
+        console.error('Failed to load transactions:', e);
+      }
     }
-    if (savedRole) {
-      setRole(savedRole);
-    }
+
+    if (savedTheme) setTheme(savedTheme);
+    if (savedRole) setRole(savedRole);
   }, []);
+
+  // Save to localStorage whenever transactions change
+  useEffect(() => {
+    localStorage.setItem('finance-dashboard-transactions', JSON.stringify(transactions));
+  }, [transactions]);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -139,8 +172,35 @@ function App() {
   }, [transactions]);
 
   const handleAddTransaction = (data) => {
-    const id = transactions.length ? Math.max(...transactions.map((item) => item.id)) + 1 : 1;
-    setTransactions((prev) => [{ id, ...data }, ...prev]);
+    setIsLoading(true);
+    setTimeout(() => {
+      const id = transactions.length ? Math.max(...transactions.map((item) => item.id)) + 1 : 1;
+      dispatch({ type: ADD_TRANSACTION, payload: { id, ...data } });
+      setIsLoading(false);
+    }, 500); // Simulate async operation
+  };
+
+  const exportToCSV = () => {
+    const headers = ['Date', 'Description', 'Category', 'Type', 'Amount'];
+    const rows = transactions.map(t => [
+      t.date,
+      t.description,
+      t.category,
+      t.type,
+      t.amount
+    ]);
+
+    const csvContent = [headers, ...rows]
+      .map(row => row.map(field => `"${field}"`).join(','))
+      .join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'transactions.csv';
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -161,6 +221,13 @@ function App() {
             onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
           >
             {theme === 'light' ? 'Dark mode' : 'Light mode'}
+          </button>
+          <button
+            type="button"
+            className="export-button"
+            onClick={exportToCSV}
+          >
+            Export CSV
           </button>
           <RolePanel role={role} onRoleChange={setRole} />
         </div>
@@ -190,6 +257,7 @@ function App() {
             sortDirection={sortDirection}
             setSortDirection={setSortDirection}
             formatCurrency={formatCurrency}
+            isLoading={isLoading}
           />
           <InsightsPanel
             totals={totals}

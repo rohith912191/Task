@@ -26,7 +26,8 @@ function TransactionsPanel({
   setSortKey,
   sortDirection,
   setSortDirection,
-  formatCurrency
+  formatCurrency,
+  isLoading
 }) {
   const [form, setForm] = useState({ date: '', amount: '', category: 'Groceries', type: 'expense', description: '' });
 
@@ -146,8 +147,8 @@ function TransactionsPanel({
                 />
               </label>
             </div>
-            <button type="submit" className="primary-button" disabled={!canSave}>
-              Add transaction
+            <button type="submit" className="primary-button" disabled={!canSave || isLoading}>
+              {isLoading ? 'Adding...' : 'Add transaction'}
             </button>
           </form>
         </div>
