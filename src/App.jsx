@@ -223,6 +223,17 @@ function App() {
           <p className="developer-tagline">
             Built and maintained by Aggannagqri Rohith Reddy — CSE undergraduate focused on Python, web development, and machine learning.
           </p>
+          <div className="header-links">
+            <a href="mailto:rohith912191@gmail.com">rohith912191@gmail.com</a>
+            <span>|</span>
+            <a href="tel:+919121916107">+91 91219 6107</a>
+            <span>|</span>
+            <a href="https://github.com/rohith912191" target="_blank" rel="noreferrer">GitHub</a>
+            <span>|</span>
+            <a href="https://portfolio1-smoky-omega.vercel.app/" target="_blank" rel="noreferrer">Portfolio</a>
+            <span>|</span>
+            <a href="https://www.linkedin.com/in/rohith-reddy91/" target="_blank" rel="noreferrer">LinkedIn</a>
+          </div>
         </div>
 
         <div className="header-actions">

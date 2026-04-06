@@ -107,6 +107,28 @@ button {
   align-items: center;
 }
 
+.header-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+  align-items: center;
+}
+
+.header-links span {
+  color: var(--muted);
+}
+
+.header-links a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.header-links a:hover {
+  text-decoration: underline;
+}
+
 .theme-switcher,
 .primary-button,
 .sort-toggle,
